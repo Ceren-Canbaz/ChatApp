@@ -52,7 +52,18 @@ namespace ChatApp
 		}
 		private void btnSend_Click(object sender, EventArgs e)
 		{
-			
+			if(connection.client.Connected)
+			{
+				encryption.EncryptedMessage= Encryption.SHA256_Encrypting(txtMessage.Text);
+				connection.s_writer.WriteLine(encryption.EncryptedMessage);
+			}
+			this.chatScreen.Invoke(new MethodInvoker(delegate()
+				{
+					chatScreen.AppendText(" "+encryption.EncryptedMessage);
+				
+			}));
+
+
 		}
 	}
 }
