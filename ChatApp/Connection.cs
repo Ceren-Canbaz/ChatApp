@@ -16,7 +16,7 @@ namespace ChatApp
 		public StreamWriter s_writer { get; set; }
 		public string reciever { get; set; }
 		public string text { get; set; }
-		public string passKey = "12345";
+		public string key = "12345";
 		public IPAddress[] IPAddresses { get; set; }
 
 		public IPAddress[] GetAddresses()

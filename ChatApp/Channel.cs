@@ -16,7 +16,7 @@ namespace ChatApp
 
 
 
-		public void startChannel(Connection c)
+		public Connection startChannel(Connection c)
 		{
 			try
 			{
@@ -24,20 +24,22 @@ namespace ChatApp
 				TcpListener tcpListener = new TcpListener(IPAddress.Any, 10);
 				tcpListener.Start(); //baglanti istekleri dinlenir
 				c.client = tcpListener.AcceptTcpClient();//baglanti istegi kabul edilir
-
 				c.s_reader = new StreamReader(c.client.GetStream());//veri okur
 				c.s_writer = new StreamWriter(c.client.GetStream());//verileri yazar
 				c.s_writer.AutoFlush = true;
+				
 			}
 			catch
 			{
 				MessageBox.Show("Failed Connection");
 			}
+			return c;
 		}
 
 
-		public void connectChannel(Connection c, string address)
+		public Connection connectChannel(Connection c, string address)
 		{
+			
 			try
 			{
 				c.client = new TcpClient();
@@ -45,6 +47,7 @@ namespace ChatApp
 				c.client.Connect(IpEnd);
 				if (c.client.Connected)
 				{
+				
 					c.s_reader = new StreamReader(c.client.GetStream());
 					c.s_writer = new StreamWriter(c.client.GetStream());
 					c.s_writer.AutoFlush = true;
@@ -54,6 +57,7 @@ namespace ChatApp
 			{
 				MessageBox.Show("Failed Connection");
 			}
+			return c;
 		}
 	}
 

@@ -37,7 +37,8 @@ namespace ChatApp
 			this.labelmsg = new System.Windows.Forms.Label();
 			this.btnSend = new System.Windows.Forms.Button();
 			this.chatScreen = new System.Windows.Forms.TextBox();
-			this.labelencrypted = new System.Windows.Forms.Label();
+			this.RunAsyncServer = new System.ComponentModel.BackgroundWorker();
+			this.RunAsyncClient = new System.ComponentModel.BackgroundWorker();
 			this.SuspendLayout();
 			// 
 			// btnStart
@@ -115,21 +116,20 @@ namespace ChatApp
 			this.chatScreen.Size = new System.Drawing.Size(456, 122);
 			this.chatScreen.TabIndex = 8;
 			// 
-			// labelencrypted
+			// RunAsyncServer
 			// 
-			this.labelencrypted.AutoSize = true;
-			this.labelencrypted.Location = new System.Drawing.Point(180, 241);
-			this.labelencrypted.Name = "labelencrypted";
-			this.labelencrypted.Size = new System.Drawing.Size(118, 17);
-			this.labelencrypted.TabIndex = 9;
-			this.labelencrypted.Text = "Sifrelenmis mesaj";
+			this.RunAsyncServer.WorkerSupportsCancellation = true;
+			this.RunAsyncServer.DoWork += new System.ComponentModel.DoWorkEventHandler(this.RunAsyncServer_DoWork);
+			// 
+			// RunAsyncClient
+			// 
+			this.RunAsyncClient.DoWork += new System.ComponentModel.DoWorkEventHandler(this.RunAsyncClient_DoWork);
 			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(475, 491);
-			this.Controls.Add(this.labelencrypted);
 			this.Controls.Add(this.chatScreen);
 			this.Controls.Add(this.btnSend);
 			this.Controls.Add(this.labelmsg);
@@ -155,7 +155,8 @@ namespace ChatApp
 		private System.Windows.Forms.Label labelmsg;
 		private System.Windows.Forms.Button btnSend;
 		private System.Windows.Forms.TextBox chatScreen;
-		private System.Windows.Forms.Label labelencrypted;
+		private System.ComponentModel.BackgroundWorker RunAsyncServer;
+		private System.ComponentModel.BackgroundWorker RunAsyncClient;
 	}
 }
 

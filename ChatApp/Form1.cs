@@ -39,31 +39,85 @@ namespace ChatApp
 
 		private void btnStart_Click(object sender, EventArgs e)
 		{
-			channel.startChannel(connection);
+			connection=channel.startChannel(connection);
 			chatScreen.AppendText("Server started");
 		}
 
 		
 		private void btnConnect_Click(object sender, EventArgs e)
 		{
+			
 			string address = txtIp.Text;
-			channel.connectChannel(connection, address);
-			chatScreen.AppendText("Connection is successful.");
+			connection=channel.connectChannel(connection, address);
+			if(connection.client.Connected)
+			{
+				chatScreen.AppendText("Connection is successful.");
+				RunAsyncClient.RunWorkerAsync();
+				RunAsyncServer.WorkerSupportsCancellation = true;
+			}
+			
+			
 		}
 		private void btnSend_Click(object sender, EventArgs e)
 		{
+			encryption.Message = txtMessage.Text;
+			RunAsyncServer.RunWorkerAsync();
+			
+			//while(connection.client.Connected)
+			//{
+
+			//	//if sha256
+			//	//encryption= Encryption.SHA256_Encrypted(txtMessage.Text,connection.key);
+			//	//connection.s_writer.WriteLine(encryption.DescryptedMessage);
+			//	//this.chatScreen.Invoke(new MethodInvoker(delegate ()
+			//	//{
+			//	//	chatScreen.AppendText("Client: " + encryption.DescryptedMessage + "\n");
+			//	//}));
+			//	connection.reciever = connection.s_reader.ReadLine();
+			//	this.chatScreen.Invoke(new MethodInvoker(delegate ()
+			//	{
+			//		chatScreen.AppendText(connection.reciever);
+			//	}));
+			//	encryption.Message = txtMessage.Text;
+			//	if(connection.client.Connected)
+			//	{
+			//		connection.s_writer.WriteLine(encryption.Message);
+			//		this.chatScreen.Invoke(new MethodInvoker(delegate ()
+			//		{
+			//			chatScreen.AppendText(encryption.Message);
+			//		}));
+			//	}
+			//}
+			
+			
+
+		}
+
+		private void RunAsyncServer_DoWork(object sender, DoWorkEventArgs e)
+		{
 			if(connection.client.Connected)
 			{
-				encryption.EncryptedMessage= Encryption.SHA256_Encrypting(txtMessage.Text);
-				connection.s_writer.WriteLine(encryption.EncryptedMessage);
-			}
-			this.chatScreen.Invoke(new MethodInvoker(delegate()
+				connection.s_writer.WriteLine(encryption.Message);
+				this.chatScreen.Invoke(new MethodInvoker(delegate ()
 				{
-					chatScreen.AppendText(" "+encryption.EncryptedMessage);
-				
-			}));
+					chatScreen.AppendText("Ben: " + encryption.Message + "\r\n");
 
+				}));
+				RunAsyncServer.CancelAsync();
+			}
+		}
 
+		private void RunAsyncClient_DoWork(object sender, DoWorkEventArgs e)
+		{
+			while(connection.client.Connected)
+			{
+				connection.reciever = connection.s_reader.ReadLine();
+				this.chatScreen.Invoke(new MethodInvoker(delegate ()
+				{
+					chatScreen.AppendText("Arkadaş: " + connection.reciever + "\r\n");
+				}));
+				connection.reciever = "";
+			}
 		}
 	}
 }
