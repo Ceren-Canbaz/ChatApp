@@ -10,32 +10,38 @@ namespace ChatApp
 {
 	public class Encryption
 	{
-		public string Message { get; set; }
-		public string Agorithm { get; set; }
-		public string EncryptedMessage { get; set; }
-		public string DescryptedMessage { get; set; }
+		public  string Message { get; set; }
+		public  string Algorithm { get; set; }
+		public  string EncryptedMessage { get; set; }
+		public  string DescryptedMessage { get; set; }
+		public  bool Situation { get; set; }
+
+
+
+
+
+
+
+
+
 
 
 		public static Encryption SHA256_Encrypted(string message, string pass)
 		{
 			Encryption msg = new Encryption();
 
-			// Get the bytes of the string
+			//Enccryption
 			byte[] bytesToBeEncrypted = Encoding.UTF8.GetBytes(message);
 			byte[] passwordBytes = Encoding.UTF8.GetBytes(pass);
 
-			// Hash the password with SHA256
+		
 			passwordBytes = SHA256.Create().ComputeHash(passwordBytes);
 
 			byte[] bytesEncrypted = AES_Encrypt(bytesToBeEncrypted, passwordBytes);
 
 			string encryptedResult = Convert.ToBase64String(bytesEncrypted);
-
-			/***********************End*Encryption******************************************/
-
-
-			/***********************Decryption**********************************************/
-			// Get the bytes of the string
+			msg.EncryptedMessage = encryptedResult;
+			//descryption
 			byte[] bytesToBeDecrypted = Convert.FromBase64String(encryptedResult);
 			byte[] passwordBytesdecrypt = Encoding.UTF8.GetBytes(pass);
 			passwordBytes = SHA256.Create().ComputeHash(passwordBytesdecrypt);
@@ -124,6 +130,75 @@ namespace ChatApp
 			}
 
 			return encryptedBytes;
+		}
+
+		public static string SHA_256_Encrypting(string deger)
+		{
+			SHA256 sha = SHA256.Create();
+			byte[] degerBytes = Encoding.UTF8.GetBytes(deger);
+			byte[] shaBytes = sha.ComputeHash(degerBytes);
+			return HashToByte_256(shaBytes);
+		}
+
+		public static string HashToByte_256(byte[] hash)
+		{
+			StringBuilder result = new StringBuilder();
+			foreach (byte item in hash)
+			{
+				result.Append(item.ToString("x2"));
+
+			}
+
+			return result.ToString();
+		}
+		public static Encryption SPN_Encryp(Encryption enc,Connection cn)
+		{
+			int j = 0;
+			string mesaj = "";
+			string s1 = "";
+			string s2 = "";
+			string s3 = "";
+			string s4 = "";
+			for (int i = 0; i < enc.Message.Length; i++)
+			{
+				enc.EncryptedMessage += Convert.ToChar(Convert.ToInt32(enc.Message[i] + Convert.ToInt32(cn.key[j])) % 351);
+
+				if (j == cn.key.Length)
+					j = 0;
+
+
+				if (Convert.ToInt32(enc.Message[i]) == Convert.ToInt32(cn.key[j]))
+				{
+					mesaj += 0;
+				}
+				else
+				{
+					mesaj += 1;
+				}
+				j += 1;
+
+			}
+			for (int k = 0; k < 16; k++)
+			{
+				if (k < 4)
+				{
+					s1 += mesaj[k];
+				}
+				if ((k >= 4) && (k < 8))
+				{
+					s2 += mesaj[k];
+				}
+				if ((k >= 8) && (k < 12))
+				{
+					s3 += mesaj[k];
+				}
+				if (k >= 12)
+				{
+					s4 += mesaj[k];
+				}
+			}
+			
+			return enc;
 		}
 	}
 }

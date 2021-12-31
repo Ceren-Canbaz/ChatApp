@@ -13,9 +13,6 @@ namespace ChatApp
 	public class Channel
 	{
 		
-
-
-
 		public Connection startChannel(Connection c)
 		{
 			try
@@ -43,11 +40,11 @@ namespace ChatApp
 			try
 			{
 				c.client = new TcpClient();
-				IPEndPoint IpEnd = new IPEndPoint(IPAddress.Parse(address), 10);
-				c.client.Connect(IpEnd);
+				IPEndPoint Ip = new IPEndPoint(IPAddress.Parse(address), 10);
+				c.client.Connect(Ip);
 				if (c.client.Connected)
 				{
-				
+					c.situation = "Connection";
 					c.s_reader = new StreamReader(c.client.GetStream());
 					c.s_writer = new StreamWriter(c.client.GetStream());
 					c.s_writer.AutoFlush = true;
@@ -59,6 +56,34 @@ namespace ChatApp
 			}
 			return c;
 		}
+		public Encryption readChannel(Connection cn, Encryption encr)
+		{
+
+			if(encr.Algorithm=="sha256")
+			{
+				encr = Encryption.SHA256_Encrypted(encr.Message,cn.key); 
+			}
+			else //spn 
+			{
+				encr = Encryption.SPN_Encryp(encr, cn);
+			}
+			return encr;
+		}
+		public Encryption sendChannel(Connection cn, Encryption encr)
+		{
+
+			if (encr.Algorithm == "sha256")
+			{
+				encr = Encryption.SHA256_Encrypted(encr.Message, cn.key);
+			}
+			else //spn
+			{
+				encr = Encryption.SPN_Encryp(encr,cn);
+			
+			}
+			return encr;
+		}
+
 	}
 
 

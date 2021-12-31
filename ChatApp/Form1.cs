@@ -19,6 +19,7 @@ namespace ChatApp
 		Connection connection = new Connection();
 		Channel channel = new Channel();
 		Encryption encryption = new Encryption();
+	
 		public Form1()
 		{
 		
@@ -27,6 +28,7 @@ namespace ChatApp
 			//fonksiyonununu çağırarak alıyoruz
 			//multi thread için 
 			connection.IPAddresses = connection.GetAddresses();
+			
 			foreach (IPAddress adress in connection.IPAddresses)
 			{
 				if (adress.AddressFamily == AddressFamily.InterNetwork)
@@ -34,90 +36,77 @@ namespace ChatApp
 					txtIp.Text = adress.ToString();
 				}
 			}
-
 		}
 
 		private void btnStart_Click(object sender, EventArgs e)
 		{
-			connection=channel.startChannel(connection);
-			chatScreen.AppendText("Server started");
+			try { 
+				connection=channel.startChannel(connection); 
+				chatScreen.AppendText("Connected\r\n");
+			}
+			catch
+			{
+				MessageBox.Show("Failed Connection");
+			}
 		}
 
 		
 		private void btnConnect_Click(object sender, EventArgs e)
 		{
-			
-			string address = txtIp.Text;
-			connection=channel.connectChannel(connection, address);
-			if(connection.client.Connected)
+			try
 			{
-				chatScreen.AppendText("Connection is successful.");
-				RunAsyncClient.RunWorkerAsync();
-				RunAsyncServer.WorkerSupportsCancellation = true;
-			}
+				
+				connection = channel.connectChannel(connection, txtIp.Text);
+				connection.msg=connection.s_reader.ReadLine();
+				chatScreen.AppendText(connection.situation);
+				while(connection.client.Connected)
+				{
+					chatScreen.AppendText(connection.situation);
+					encryption=channel.readChannel(connection,encryption);
+				}
 			
+			}
+			catch
+			{
+				MessageBox.Show("Failed Connection");
+			}			
 			
 		}
-		private void btnSend_Click(object sender, EventArgs e)
+		public void btnSend_Click(object sender, EventArgs e)
 		{
 			encryption.Message = txtMessage.Text;
-			RunAsyncServer.RunWorkerAsync();
-			
-			//while(connection.client.Connected)
-			//{
 
-			//	//if sha256
-			//	//encryption= Encryption.SHA256_Encrypted(txtMessage.Text,connection.key);
-			//	//connection.s_writer.WriteLine(encryption.DescryptedMessage);
-			//	//this.chatScreen.Invoke(new MethodInvoker(delegate ()
-			//	//{
-			//	//	chatScreen.AppendText("Client: " + encryption.DescryptedMessage + "\n");
-			//	//}));
-			//	connection.reciever = connection.s_reader.ReadLine();
-			//	this.chatScreen.Invoke(new MethodInvoker(delegate ()
-			//	{
-			//		chatScreen.AppendText(connection.reciever);
-			//	}));
-			//	encryption.Message = txtMessage.Text;
-			//	if(connection.client.Connected)
-			//	{
-			//		connection.s_writer.WriteLine(encryption.Message);
-			//		this.chatScreen.Invoke(new MethodInvoker(delegate ()
-			//		{
-			//			chatScreen.AppendText(encryption.Message);
-			//		}));
-			//	}
-			//}
-			
-			
-
-		}
-
-		private void RunAsyncServer_DoWork(object sender, DoWorkEventArgs e)
-		{
-			if(connection.client.Connected)
+			if (connection.client.Connected)
 			{
-				connection.s_writer.WriteLine(encryption.Message);
-				this.chatScreen.Invoke(new MethodInvoker(delegate ()
-				{
-					chatScreen.AppendText("Ben: " + encryption.Message + "\r\n");
+					encryption = channel.sendChannel(connection, encryption);
+					connection.s_writer.WriteLine(encryption.DescryptedMessage);
+					this.chatScreen.Invoke(new MethodInvoker(delegate ()
+					{
+						chatScreen.AppendText("Send: " + encryption.DescryptedMessage + "\n");
 
-				}));
-				RunAsyncServer.CancelAsync();
+					}));
+
+
+				
+				
+
 			}
+
 		}
 
-		private void RunAsyncClient_DoWork(object sender, DoWorkEventArgs e)
+		private void button1_Click(object sender, EventArgs e)
 		{
-			while(connection.client.Connected)
+			encryption.Message = txtMessage.Text;
+
+			if (connection.client.Connected)
 			{
-				connection.reciever = connection.s_reader.ReadLine();
-				this.chatScreen.Invoke(new MethodInvoker(delegate ()
-				{
-					chatScreen.AppendText("Arkadaş: " + connection.reciever + "\r\n");
-				}));
-				connection.reciever = "";
+
+				encryption = Encryption.SHA256_Encrypted(txtMessage.Text, connection.key);
+				txtEncrypted.Text = Encryption.SHA_256_Encrypting(txtMessage.Text);
+				connection.s_writer.WriteLine(encryption.DescryptedMessage);
+
 			}
 		}
 	}
+	
 }

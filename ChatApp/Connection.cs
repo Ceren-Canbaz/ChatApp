@@ -13,8 +13,11 @@ namespace ChatApp
 	{
 		public TcpClient client { get; set; }
 		public StreamReader s_reader { get; set; }
+		
 		public StreamWriter s_writer { get; set; }
-		public string reciever { get; set; }
+		
+		public string msg { get; set; }
+		public string situation { get; set; }
 		public string text { get; set; }
 		public string key = "12345";
 		public IPAddress[] IPAddresses { get; set; }
@@ -24,10 +27,6 @@ namespace ChatApp
 			IPAddress[] ipAddress = Dns.GetHostAddresses(Dns.GetHostName());
 			return ipAddress;
 		}
-
-		
-
-
      
     }
 }
